@@ -5,9 +5,12 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS  # to prevent frontend blocking GET requests
+from matplotlib.colors import LinearSegmentedColormap  # color customization
 from ultralytics import YOLO
 
 app = Flask(__name__)
+CORS(app)  # Allow all domains by default
 
 model = YOLO("ai/garbage_detector_best_s.pt")
 
@@ -75,23 +78,24 @@ def generate_heatmap():
     try:
         df = pd.read_csv(CSV_FILE_PATH)
 
-        columnLabels = ['Est. 2025 Population', '2020 Population', '2015 Population']
+        column_labels = ['Est. 2025 Population', '2020 Population', '2015 Population']
 
         # Convert columns to numeric, coercing errors
-        df[columnLabels] = df[columnLabels].apply(pd.to_numeric, errors='coerce')
+        df[column_labels] = df[column_labels].apply(pd.to_numeric, errors='coerce')
 
         # Create the heatmap with only numeric data
-        numeric_df = df[columnLabels]
+        numeric_df = df[column_labels]
 
-        fig, ax = plt.subplots(figsize=(8, 4))
-        cax = ax.imshow(numeric_df, cmap='coolwarm', aspect='auto')
+        greens = LinearSegmentedColormap.from_list("greens", ["#E9F3E4", "#6B8E6B"])  # Light green to dark green
 
-        # Add color bar
-        fig.colorbar(cax)
+        fig, ax = plt.subplots(figsize=(8, 6))
+        cax = ax.imshow(numeric_df, cmap=greens, aspect='auto')  # Apply the custom colormap
+
+        fig.colorbar(cax)  # graph legend
 
         # Set axis labels
         ax.set_xticks(np.arange(len(numeric_df.columns)))
-        ax.set_xticklabels(numeric_df.columns, rotation=45, ha="right")
+        ax.set_xticklabels(numeric_df.columns, rotation=30, ha="right")
 
         ax.set_yticks(np.arange(len(df)))
         ax.set_yticklabels(df['Dumpsite Location'])
@@ -99,7 +103,7 @@ def generate_heatmap():
         # Value (cell text)
         for i in range(len(df)):
             for j in range(len(numeric_df.columns)):
-                ax.text(j, i, f"{numeric_df.iloc[i, j]}", ha='center', va='center', color='black', fontsize=8)
+                ax.text(j, i, f"{numeric_df.iloc[i, j]}", ha='center', va='center', color='black', fontsize=12)
 
         # Remove axis ticks
         ax.set_xticks(np.arange(len(numeric_df.columns)))
