@@ -12,7 +12,7 @@ from ultralytics import YOLO
 app = Flask(__name__)
 CORS(app)  # Allow all domains by default
 
-model = YOLO("ai/garbage_detector_best_s.pt")
+model = YOLO("ai/gd_l_e15.pt")
 
 # CSV file in 'data' folder
 CSV_FILE_PATH = os.path.join(os.path.dirname(__file__), 'data', 'LAPUK_heatmapDataset.csv')
