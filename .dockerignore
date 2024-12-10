@@ -1,4 +1,12 @@
 __pycache__
 *.pyc
-.git
-.venv
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+.DS_Store
+.env
+ai/*
+!ai/gd_l_e15.pt
+runs
